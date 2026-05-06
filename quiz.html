@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест по компьютерным сетям</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #a0a0b0;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 12px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: #a0a0b0;
+            font-size: 0.95rem;
+        }
+
+        .question-card {
+            background: rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .question-number {
+            color: #00d2ff;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(0,210,255,0.5);
+        }
+
+        .option.selected {
+            border-color: #00d2ff;
+            background: rgba(0,210,255,0.15);
+        }
+
+        .option.correct {
+            border-color: #00e676;
+            background: rgba(0,230,118,0.15);
+        }
+
+        .option.wrong {
+            border-color: #ff5252;
+            background: rgba(255,82,82,0.15);
+        }
+
+        .option-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-letter {
+            background: #00d2ff;
+            color: #000;
+        }
+
+        .option.correct .option-letter {
+            background: #00e676;
+            color: #000;
+        }
+
+        .option.wrong .option-letter {
+            background: #ff5252;
+            color: #fff;
+        }
+
+        .option-text {
+            line-height: 1.4;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,210,255,0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .results h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: conic-gradient(#00d2ff 0%, #00d2ff var(--score), rgba(255,255,255,0.1) var(--score));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #24243e;
+            position: absolute;
+        }
+
+        .score-text {
+            position: relative;
+            z-index: 1;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .result-message {
+            color: #a0a0b0;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #c0c0d0;
+            line-height: 1.5;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .navigation .btn {
+            margin-top: 0;
+        }
+
+        .question-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dot.active {
+            background: #00d2ff;
+            color: #000;
+        }
+
+        .dot.answered {
+            background: rgba(0,210,255,0.3);
+        }
+
+        .dot:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+            .question-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Тест по компьютерным сетям</h1>
+            <p style="color: #00d2ff; font-size: 0.95rem; margin-top: 5px;">Подготовка к экзамену</p>
+            <p style="color: #a0a0b0; font-size: 0.9rem; margin-top: 5px;">Модель OSI, TCP/IP, протоколы и сети</p>
+        </div>
+
+        <div id="quiz-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="stats">
+                <span id="question-counter">Вопрос 1 из 18</span>
+                <span id="score-display">Баллы: 0</span>
+            </div>
+
+            <div class="question-dots" id="question-dots"></div>
+
+            <div class="question-card">
+                <div class="question-number" id="question-number">Вопрос 1</div>
+                <div class="question-text" id="question-text"></div>
+                <div class="options" id="options-container"></div>
+                <div class="explanation hidden" id="explanation"></div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevQuestion()">Назад</button>
+                <button class="btn btn-primary" id="check-btn" onclick="checkAnswer()">Проверить</button>
+                <button class="btn btn-primary hidden" id="next-btn" onclick="nextQuestion()">Далее</button>
+            </div>
+        </div>
+
+        <div id="results-section" class="hidden">
+            <div class="results">
+                <h2>Результаты теста</h2>
+                <div class="score-circle" id="score-circle">
+                    <span class="score-text" id="score-percent"></span>
+                </div>
+                <div class="result-message" id="result-message"></div>
+                <p id="score-details" style="color: #a0a0b0; margin-bottom: 30px;"></p>
+                <button class="btn btn-primary" onclick="restartQuiz()">Пройти заново</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Какие уровни модели OSI отвечают за передачу данных между компьютерами?",
+                options: [
+                    "Только прикладной и представительский уровни",
+                    "Физический, канальный, сетевой и транспортный уровни",
+                    "Только сетевой и транспортный уровни",
+                    "Сеансовый и представительский уровни"
+                ],
+                correct: 1,
+                explanation: "За передачу данных между компьютерами в модели OSI в первую очередь отвечают первые четыре уровня: физический, канальный, сетевой и транспортный."
+            },
+            {
+                question: "Что передаётся на физическом уровне модели OSI?",
+                options: [
+                    "Кадры с MAC-адресами",
+                    "IP-пакеты",
+                    "Физические сигналы: электрический ток, свет, радиоволны (0 и 1)",
+                    "Зашифрованные данные приложений"
+                ],
+                correct: 2,
+                explanation: "На физическом уровне передаются не данные, а физические сигналы: электрический ток (витая пара), свет (оптоволокно), радио (Wi-Fi, Bluetooth). Компьютеры здесь передают только «есть сигнал / нет сигнала» (0 и 1)."
+            },
+            {
+                question: "Какие функции выполняет физический уровень модели OSI?",
+                options: [
+                    "Маршрутизация пакетов между сетями",
+                    "Шифрование и сжатие данных",
+                    "Передача битов, кодирование сигнала, синхронизация, определение физических интерфейсов",
+                    "Установление соединений между приложениями"
+                ],
+                correct: 2,
+                explanation: "Основные функции физического уровня: передача битов (0 и 1), кодирование сигнала (NRZ, PAM4, Manchester), синхронизация и определение физических интерфейсов (тип кабеля, напряжение, частоты)."
+            },
+            {
+                question: "Что такое IP-адрес?",
+                options: [
+                    "Уникальный идентификатор сетевого интерфейса в локальной сети",
+                    "Уникальный сетевой адрес устройства в компьютерной сети, построенной на TCP/IP",
+                    "Название протокола передачи данных",
+                    "Тип кабеля для подключения к интернету"
+                ],
+                correct: 1,
+                explanation: "IP-адрес — уникальный сетевой адрес устройства в компьютерной среде, построенной на основе протоколов TCP/IP. Нужен для того, чтобы устройства могли находить друг друга и обмениваться данными."
+            },
+            {
+                question: "Из скольких бит состоит IPv4-адрес?",
+                options: [
+                    "16 бит",
+                    "32 бита",
+                    "64 бита",
+                    "128 бит"
+                ],
+                correct: 1,
+                explanation: "IPv4-адрес представляет собой серию из 32 двоичных бит. Делится на 4 октета (части) по 8 бит. Максимальное число в любом октете — 255, минимальное — 0."
+            },
+            {
+                question: "Что показывает маска подсети?",
+                options: [
+                    "Скорость подключения к сети",
+                    "Какая часть IP-адреса относится к сети, а какая — к узлу (хосту)",
+                    "Количество устройств в локальной сети",
+                    "Тип протокола передачи данных"
+                ],
+                correct: 1,
+                explanation: "Маска подсети — это значение, которое показывает, какая часть IP-адреса относится к сети, а какая — к узлу (хосту)."
+            },
+            {
+                question: "Что такое прикладной уровень модели OSI?",
+                options: [
+                    "Уровень, отвечающий за физическую передачу сигналов",
+                    "Уровень, обеспечивающий взаимодействие пользователя и приложений с сетью",
+                    "Уровень, отвечающий за маршрутизацию пакетов",
+                    "Уровень, отвечающий за шифрование данных"
+                ],
+                correct: 1,
+                explanation: "Прикладной уровень — самый верхний уровень, который обеспечивает взаимодействие пользователя и приложений с сетью. Это набор протоколов и сервисов, позволяющих приложениям работать через сеть."
+            },
+            {
+                question: "Какой протокол прикладного уровня отвечает за загрузку сайтов?",
+                options: [
+                    "FTP",
+                    "SMTP",
+                    "HTTP/HTTPS",
+                    "DNS"
+                ],
+                correct: 2,
+                explanation: "HTTP/HTTPS — протокол прикладного уровня, отвечающий за загрузку сайтов. FTP — передача файлов, SMTP — отправка писем, DNS — перевод имён сайтов в IP-адреса."
+            },
+            {
+                question: "Какие протоколы используются на канальном уровне модели OSI?",
+                options: [
+                    "TCP, UDP",
+                    "IP, ICMP",
+                    "Ethernet, ARP, Wi-Fi, PPP",
+                    "HTTP, FTP, DNS"
+                ],
+                correct: 2,
+                explanation: "На канальном уровне используются протоколы: Ethernet (кадры, MAC-адреса), ARP (сопоставление IP с MAC-адресом), Wi-Fi (беспроводной аналог Ethernet), PPP (соединение точка-точка)."
+            },
+            {
+                question: "Что такое MAC-адрес?",
+                options: [
+                    "IP-адрес устройства в интернете",
+                    "Пароль для подключения к Wi-Fi",
+                    "Уникальный идентификатор сетевого интерфейса внутри локальной сети (48 бит, 12 символов)",
+                    "Название протокола передачи данных"
+                ],
+                correct: 2,
+                explanation: "MAC-адрес — уникальный идентификатор сетевого интерфейса внутри локальной сети. Состоит из 48 бит (12 символов). Используется на канальном уровне для указания получателя в кадре."
+            },
+            {
+                question: "Какое основное отличие TCP от UDP?",
+                options: [
+                    "TCP быстрее, UDP медленнее",
+                    "TCP гарантирует доставку и устанавливает соединение, UDP не гарантирует доставку и не устанавливает соединение",
+                    "TCP используется для видео, UDP — для веб-сайтов",
+                    "TCP работает на сетевом уровне, UDP — на канальном"
+                ],
+                correct: 1,
+                explanation: "TCP обеспечивает надёжную передачу с установлением соединения, гарантирует доставку, контроль перегрузок. UDP передаёт данные без установления соединения, не гарантирует доставку, но работает быстрее."
+            },
+            {
+                question: "Для каких приложений используется протокол UDP?",
+                options: [
+                    "Веб-браузеры и электронная почта",
+                    "Загрузка файлов",
+                    "Онлайн-игры, стримы, видеозвонки, DNS-запросы",
+                    "Удалённое управление сервером"
+                ],
+                correct: 2,
+                explanation: "UDP используется там, где допустимы небольшие потери и важна скорость: онлайн-игры, стримы, видеозвонки, DNS-запросы."
+            },
+            {
+                question: "Что такое маршрутизация в сети?",
+                options: [
+                    "Процесс подключения устройства к Wi-Fi",
+                    "Процесс передачи данных через сеть от одного узла к другому по оптимальному пути",
+                    "Процесс шифрования данных при передаче",
+                    "Процесс назначения IP-адресов устройствам"
+                ],
+                correct: 1,
+                explanation: "Маршрутизация — это процесс, при котором данные передаются через сеть от одного узла к другому по оптимальному пути. Маршрутизатор анализирует IP-адрес и по таблице маршрутизации выбирает следующий путь."
+            },
+            {
+                question: "Для чего нужен сеансовый уровень модели OSI?",
+                options: [
+                    "Для физической передачи битов",
+                    "Для маршрутизации пакетов между сетями",
+                    "Для установления, поддержания и завершения сеанса связи между устройствами",
+                    "Для шифрования и сжатия данных"
+                ],
+                correct: 2,
+                explanation: "Сеансовый уровень отвечает за установление, поддержание и завершение сеанса связи между устройствами. Управляет соединением, контролирует начало, процесс и завершение связи, обеспечивает синхронизацию."
+            },
+            {
+                question: "Сколько уровней в модели TCP/IP?",
+                options: [
+                    "3",
+                    "5",
+                    "4",
+                    "7"
+                ],
+                correct: 2,
+                explanation: "Модель TCP/IP имеет 4 уровня: канальный, интернет-уровень, транспортный и прикладной. Это практическая модель, используемая в интернете."
+            },
+            {
+                question: "Что такое SDN (Software-Defined Networking)?",
+                options: [
+                    "Новый тип сетевого кабеля",
+                    "Подход к построению сети, при котором управление отделяется от оборудования и переносится в ПО",
+                    "Протокол беспроводной связи",
+                    "Тип сетевого маршрутизатора"
+                ],
+                correct: 1,
+                explanation: "SDN — подход к построению сети, при котором управление сетью отделяется от оборудования и переносится в программное обеспечение. Управление становится централизованным, а сетевые устройства выполняют только пересылку данных."
+            },
+            {
+                question: "Что делает представительский уровень модели OSI с данными?",
+                options: [
+                    "Передаёт физические сигналы",
+                    "Маршрутизирует пакеты между сетями",
+                    "Кодирует/декодирует, шифрует/дешифрует, сжимает/распаковывает данные",
+                    "Устанавливает соединение между приложениями"
+                ],
+                correct: 2,
+                explanation: "Уровень представления отвечает за преобразование данных в формат, понятный принимающей стороне: кодирование и декодирование, шифрование и дешифрование, сжатие и распаковка данных."
+            },
+            {
+                question: "Как VPN обеспечивает безопасность в сети?",
+                options: [
+                    "Увеличивает скорость интернета",
+                    "Создаёт защищённый зашифрованный канал, скрывает реальный IP-адрес, защищает от перехвата данных",
+                    "Блокирует все входящие подключения",
+                    "Автоматически обновляет антивирус"
+                ],
+                correct: 1,
+                explanation: "VPN создаёт защищённое (зашифрованное) соединение, формируя «виртуальный тоннель». Шифрует данные, скрывает реальный IP-адрес, обеспечивает безопасность в публичных Wi-Fi сетях."
+            },
+            {
+                question: "Что такое инкапсуляция в модели OSI?",
+                options: [
+                    "Процесс удаления служебной информации при приёме данных",
+                    "Процесс «упаковки» данных при отправке — каждый уровень добавляет свою служебную информацию",
+                    "Процесс шифрования данных на прикладном уровне",
+                    "Процесс маршрутизации пакетов"
+                ],
+                correct: 1,
+                explanation: "Инкапсуляция (отправка) — процесс «упаковки» данных (сверху вниз). Каждый уровень добавляет к данным свою служебную информацию. Декапсуляция (приём) — обратный процесс «распаковки»."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answers = new Array(quizData.length).fill(null);
+        let checked = new Array(quizData.length).fill(false);
+
+        function initQuiz() {
+            renderDots();
+            renderQuestion();
+            updateProgress();
+        }
+
+        function renderDots() {
+            const dotsContainer = document.getElementById('question-dots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < quizData.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === currentQuestion ? ' active' : '') + (answers[i] !== null ? ' answered' : '');
+                dot.textContent = i + 1;
+                dot.onclick = () => goToQuestion(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('question-number').textContent = `Вопрос ${currentQuestion + 1}`;
+            document.getElementById('question-text').textContent = q.question;
+            document.getElementById('question-counter').textContent = `Вопрос ${currentQuestion + 1} из ${quizData.length}`;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            const letters = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                if (answers[currentQuestion] === index) {
+                    optionEl.classList.add('selected');
+                }
+                if (checked[currentQuestion]) {
+                    if (index === q.correct) {
+                        optionEl.classList.add('correct');
+                    } else if (answers[currentQuestion] === index) {
+                        optionEl.classList.add('wrong');
+                    }
+                    optionEl.style.pointerEvents = 'none';
+                }
+                optionEl.innerHTML = `
+                    <div class="option-letter">${letters[index]}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                optionEl.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+
+            const explanation = document.getElementById('explanation');
+            if (checked[currentQuestion]) {
+                explanation.classList.remove('hidden');
+                explanation.textContent = q.explanation;
+            } else {
+                explanation.classList.add('hidden');
+            }
+
+            document.getElementById('prev-btn').style.display = currentQuestion === 0 ? 'none' : 'block';
+            document.getElementById('check-btn').classList.toggle('hidden', checked[currentQuestion] || answers[currentQuestion] === null);
+            document.getElementById('next-btn').classList.toggle('hidden', !checked[currentQuestion]);
+
+            renderDots();
+        }
+
+        function selectOption(index) {
+            if (checked[currentQuestion]) return;
+            answers[currentQuestion] = index;
+            renderQuestion();
+        }
+
+        function checkAnswer() {
+            if (answers[currentQuestion] === null) return;
+            checked[currentQuestion] = true;
+            if (answers[currentQuestion] === quizData[currentQuestion].correct) {
+                score++;
+            }
+            document.getElementById('score-display').textContent = `Баллы: ${score}`;
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+                updateProgress();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+                updateProgress();
+            }
+        }
+
+        function goToQuestion(index) {
+            currentQuestion = index;
+            renderQuestion();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / quizData.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('results-section').classList.remove('hidden');
+
+            const percent = Math.round((score / quizData.length) * 100);
+            document.getElementById('score-percent').textContent = percent + '%';
+            document.getElementById('score-circle').style.setProperty('--score', percent + '%');
+            document.getElementById('score-details').textContent = `Правильных ответов: ${score} из ${quizData.length}`;
+
+            let message = '';
+            if (percent >= 90) message = 'Отличный результат! Вы прекрасно разбираетесь в сетевых технологиях!';
+            else if (percent >= 70) message = 'Хороший результат! Есть небольшие пробелы, но в целом отлично.';
+            else if (percent >= 50) message = 'Средний результат. Рекомендуется повторить материал.';
+            else message = 'Нужно подучить материал. Не сдавайтесь, попробуйте снова!';
+            document.getElementById('result-message').textContent = message;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answers = new Array(quizData.length).fill(null);
+            checked = new Array(quizData.length).fill(false);
+            document.getElementById('score-display').textContent = `Баллы: 0`;
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.remove('hidden');
+            initQuiz();
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
