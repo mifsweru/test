@@ -295,6 +295,16 @@
             background: rgba(0,210,255,0.3);
         }
 
+        .dot.correct {
+            background: #00e676;
+            color: #000;
+        }
+
+        .dot.wrong {
+            background: #ff5252;
+            color: #fff;
+        }
+
         .dot:hover {
             transform: scale(1.1);
         }
@@ -1346,7 +1356,14 @@
             dotsContainer.innerHTML = '';
             for (let i = 0; i < quizData.length; i++) {
                 const dot = document.createElement('div');
-                dot.className = 'dot' + (i === currentQuestion ? ' active' : '') + (answers[i] !== null ? ' answered' : '');
+                let dotClass = 'dot';
+                if (i === currentQuestion) dotClass += ' active';
+                if (checked[i]) {
+                    dotClass += answers[i] === quizData[i].correct ? ' correct' : ' wrong';
+                } else if (answers[i] !== null) {
+                    dotClass += ' answered';
+                }
+                dot.className = dotClass;
                 dot.textContent = i + 1;
                 dot.onclick = () => goToQuestion(i);
                 dotsContainer.appendChild(dot);
